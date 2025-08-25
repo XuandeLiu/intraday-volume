@@ -1,0 +1,61 @@
+# 顶部新增
+from utils.paths import data_dir, outputs_dir, project_root_from
+from pathlib import Path
+
+# 读数据：替换原来的 'data/interim/xxx.parquet'
+root = project_root_from(__file__)
+train_path = data_dir(__file__) / 'training.parquet'
+test_path  = data_dir(__file__) / 'testing.parquet'
+
+training_df = pd.read_parquet(train_path)
+testing_df  = pd.read_parquet(test_path)
+
+# 保存 checkpoint / metrics 时也别手写字符串
+ckpt_dir = Path(cfg['paths']['checkpoints_dir'])    # 相对路径
+ckpt_dir = (root / ckpt_dir).resolve()
+ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+metrics_dir = (root / Path(cfg['paths']['metrics_dir'])).resolve()
+metrics_dir.mkdir(parents=True, exist_ok=True)
+
+# 保存：
+torch.save(best_state, ckpt_dir / 'best.pt')
+save_json({'best_inner_dev_r2': best_metric}, metrics_dir / 'train_summary.json')
+
+from utils.paths import data_dir, outputs_dir, project_root_from
+from pathlib import Path
+
+root = project_root_from(__file__)
+train_path = data_dir(__file__) / 'training.parquet'
+test_path  = data_dir(__file__) / 'testing.parquet'
+training_df = pd.read_parquet(train_path)
+testing_df  = pd.read_parquet(test_path)
+
+# ckpt 与 metrics 路径
+ckpt = (root / Path(args.ckpt)).resolve()   # args.ckpt 是相对路径：outputs/checkpoints/best.pt
+metrics_dir = (root / Path(cfg['paths']['metrics_dir'])).resolve()
+metrics_dir.mkdir(parents=True, exist_ok=True)
+
+# 保存：
+save_json({...}, metrics_dir / 'eval_summary.json')
+
+from pathlib import Path
+import sys
+# 如果你把 paths.py 暴露成包，推荐直接 from utils.paths import data_dir
+# 否则，用下面这个最小写法：
+ROOT = Path(__file__).resolve().parents[1]
+INTERIM = ROOT / 'data' / 'interim'
+INTERIM.mkdir(parents=True, exist_ok=True)
+
+training_df.to_parquet(INTERIM / 'training.parquet', index=False)
+testing_df.to_parquet(INTERIM / 'testing.parquet', index=False)
+
+
+# src/config.py
+from pathlib import Path
+from .utils.paths import project_root_from  # 如果不想循环导入，就本地算 root = Path(__file__).resolve().parents[1]
+
+def ensure_dirs(cfg):
+    root = Path(__file__).resolve().parents[1]  # src/ 的上一层就是项目根
+    for k in ['artifacts_dir', 'checkpoints_dir', 'metrics_dir', 'logs_dir']:
+        (root / Path(cfg['paths'][k])).mkdir(parents=True, exist_ok=True)
