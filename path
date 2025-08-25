@@ -1,0 +1,25 @@
+# src/utils/paths.py
+from pathlib import Path
+
+def project_root_from(src_file: str) -> Path:
+    """
+    传入 __file__，返回项目根目录：
+    - src/*/*.py  -> parents[2]
+    - scripts/*.py -> parents[1]
+    """
+    p = Path(src_file).resolve()
+    # 在 src/ 下：.../project/src/xxx.py -> parents[2]
+    if 'src' in p.parts:
+        # .../project/src/.../file.py
+        return p.parents[p.parts[::-1].index('src') + 1]
+    # 在 scripts/ 下：.../project/scripts/file.py -> parents[1]
+    if p.parent.name == 'scripts':
+        return p.parent.parent
+    # 回退：假定当前两层即项目根
+    return p.parents[2]
+
+def data_dir(src_file: str) -> Path:
+    return project_root_from(src_file) / 'data' / 'interim'
+
+def outputs_dir(src_file: str) -> Path:
+    return project_root_from(src_file) / 'outputs'
