@@ -27,7 +27,10 @@ intraday-volume-ml/
 │  └─ utils/
 │     ├─ __init__.py
 │     ├─ metrics.py              # masked MSE/MAE/R2
-│     ├─ common.py               # set_seed、save/load json、设备选择
+
+│     ├─ paths.py                   # control the paths 
+
+│     ├─ common.py           # set_seed、save/load json、设备选择
 │     └─ logging.py              # 简单日志封装
 └─ scripts/
    ├─ run_train.sh               # 一键训练（可选）
